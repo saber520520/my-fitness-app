@@ -4,16 +4,7 @@ import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { WorkoutList } from "@/components/workout-list"
 import { Badge } from "@/components/ui/badge"
-
-type Workout = {
-  id: string
-  exercise_name: string
-  workout_date: string
-  sets_data: Array<{ weight: number; reps: number }>  // 修正：使用 sets_data
-  video_url: string | null
-  weight_unit?: string
-  created_at: string
-}
+import type { Workout } from "@/lib/types"
 
 type HistoryViewProps = {
   workouts: Workout[]
@@ -161,7 +152,7 @@ export function HistoryView({ workouts, initialView }: HistoryViewProps) {
               <h3 className="text-sm font-semibold text-slate-700 px-3">{formatDate(date)}</h3>
               <div className="h-px flex-1 bg-slate-200" />
             </div>
-            <WorkoutList workouts={dateWorkouts} />
+            <WorkoutList workouts={dateWorkouts as Workout[]} />
           </div>
         ))}
       </TabsContent>
@@ -205,7 +196,7 @@ export function HistoryView({ workouts, initialView }: HistoryViewProps) {
                     .map(([date, dateWorkouts]) => (
                       <div key={date} className="space-y-2">
                         <h4 className="text-sm font-medium text-slate-600">{formatDate(date)}</h4>
-                        <WorkoutList workouts={dateWorkouts} />
+                        <WorkoutList workouts={dateWorkouts as Workout[]} />
                       </div>
                     ))}
                 </div>
@@ -246,7 +237,7 @@ export function HistoryView({ workouts, initialView }: HistoryViewProps) {
                   .map(([date, dateWorkouts]) => (
                     <div key={date} className="space-y-2">
                       <h4 className="text-sm font-medium text-slate-600">{formatDate(date)}</h4>
-                      <WorkoutList workouts={dateWorkouts} />
+                      <WorkoutList workouts={dateWorkouts as Workout[]} />
                     </div>
                   ))}
               </div>
