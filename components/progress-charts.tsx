@@ -2,14 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
-
-type Workout = {
-  id: string
-  workout_date: string
-  exercise_name: string
-  sets_data: { weight: number; reps: number }[]
-  weight_unit?: "kg" | "lbs"
-}
+import type { Workout } from "@/lib/types"
 
 export function ProgressCharts({ workouts, exerciseName }: { workouts: Workout[]; exerciseName: string }) {
   // 轉換重量單位（lbs 轉 kg）
@@ -142,7 +135,10 @@ export function ProgressCharts({ workouts, exerciseName }: { workouts: Workout[]
                   border: "1px solid #e2e8f0",
                   borderRadius: "8px",
                 }}
-                formatter={(value: number) => [`${value} ${primaryUnit}`, "最大重量"]}
+                formatter={(value: number | undefined) => {
+                  if (value === undefined) return ["", "最大重量"]
+                  return [`${value} ${primaryUnit}`, "最大重量"]
+                }}
               />
               <Legend />
               <Line type="monotone" dataKey="最大重量" stroke="#2563eb" strokeWidth={2} dot={{ fill: "#2563eb" }} />
