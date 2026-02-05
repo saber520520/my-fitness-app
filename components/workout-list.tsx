@@ -7,15 +7,7 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { WorkoutForm } from "./workout-form"
 import { FormAnalysis } from "./form-analysis"
-
-type Workout = {
-  id: string
-  exercise_name: string
-  sets_data: { weight: number; reps: number }[]
-  workout_date: string
-  video_url?: string
-  weight_unit?: "kg" | "lbs"
-}
+import type { Workout } from "@/lib/types"
 
 export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; columns?: 1 | 2 }) {
   const router = useRouter()
