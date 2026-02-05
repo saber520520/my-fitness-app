@@ -63,7 +63,7 @@ export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; co
                 {/* 文字內容在右邊 */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between mb-0 sm:mb-3 gap-2">
-                    <h3 className="font-bold text-base sm:text-lg text-slate-900 break-words pr-2 sm:truncate">
+                    <h3 className="font-bold text-base sm:text-lg text-slate-900 break-words whitespace-normal pr-2">
                       {workout.exercise_name}
                     </h3>
                     <div className="flex gap-1 flex-shrink-0 flex-col items-end sm:flex-row sm:items-center">
