@@ -10,6 +10,8 @@ type InBodyPhoto = {
   id: string
   photo_url: string
   measurement_date: string
+  ocr_text?: string | null
+  ocr_data?: Record<string, string> | null
   notes?: string
   created_at: string
 }
@@ -68,6 +70,21 @@ export function InBodyGallery({ photos }: { photos: InBodyPhoto[] }) {
                   <FileText className="h-4 w-4 mt-0.5 flex-shrink-0" />
                   <p className="line-clamp-2">{photo.notes}</p>
                 </div>
+              )}
+
+              {photo.ocr_data && Object.keys(photo.ocr_data).length > 0 ? (
+                <div className="rounded-md border border-orange-100 bg-orange-50/60 p-2 text-sm text-slate-700 mb-3">
+                  {Object.entries(photo.ocr_data).map(([key, value]) => (
+                    <div key={key} className="flex items-center justify-between">
+                      <span>{key}</span>
+                      <span className="font-medium text-slate-800">{value}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                photo.ocr_text && (
+                  <p className="text-xs text-slate-500 mb-3">已完成辨識，但尚未解析欄位</p>
+                )
               )}
 
               <Button

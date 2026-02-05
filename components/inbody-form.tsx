@@ -18,6 +18,78 @@ export function InBodyForm() {
   const [notes, setNotes] = useState("")
   const [preview, setPreview] = useState<string | null>(null)
   const [file, setFile] = useState<File | null>(null)
+  const [ocrLoading, setOcrLoading] = useState(false)
+  const [ocrProgress, setOcrProgress] = useState(0)
+  const [ocrText, setOcrText] = useState<string | null>(null)
+  const [ocrData, setOcrData] = useState<Record<string, string> | null>(null)
+  const [ocrError, setOcrError] = useState<string | null>(null)
+
+  const parseOcrData = (text: string) => {
+    const getValue = (patterns: RegExp[]) => {
+      for (const pattern of patterns) {
+        const match = text.match(pattern)
+        if (match?.[1]) {
+          return match[1].trim()
+        }
+      }
+      return null
+    }
+
+    const data: Record<string, string> = {}
+
+    const weight = getValue([/體重\s*[:：]?\s*([\d.]+\s*kg)/i, /Weight\s*[:：]?\s*([\d.]+\s*kg)/i])
+    if (weight) data["體重"] = weight
+
+    const bodyFatPercent = getValue([/體脂率\s*[:：]?\s*([\d.]+\s*%)/i, /Body\s*Fat\s*%?\s*[:：]?\s*([\d.]+\s*%)/i])
+    if (bodyFatPercent) data["體脂率"] = bodyFatPercent
+
+    const bodyFatMass = getValue([/體脂肪量\s*[:：]?\s*([\d.]+\s*kg)/i, /Body\s*Fat\s*Mass\s*[:：]?\s*([\d.]+\s*kg)/i])
+    if (bodyFatMass) data["體脂肪量"] = bodyFatMass
+
+    const skeletalMuscle = getValue([/骨骼肌量\s*[:：]?\s*([\d.]+\s*kg)/i, /Skeletal\s*Muscle\s*Mass\s*[:：]?\s*([\d.]+\s*kg)/i])
+    if (skeletalMuscle) data["骨骼肌量"] = skeletalMuscle
+
+    const bmi = getValue([/BMI\s*[:：]?\s*([\d.]+)/i])
+    if (bmi) data["BMI"] = bmi
+
+    const bmr = getValue([/基礎代謝率\s*[:：]?\s*([\d.]+\s*kcal)/i, /BMR\s*[:：]?\s*([\d.]+\s*kcal)/i])
+    if (bmr) data["基礎代謝率"] = bmr
+
+    const visceralFat = getValue([/內臟脂肪等級\s*[:：]?\s*([\d.]+)/i, /Visceral\s*Fat\s*Level\s*[:：]?\s*([\d.]+)/i])
+    if (visceralFat) data["內臟脂肪等級"] = visceralFat
+
+    const whr = getValue([/腰臀比\s*[:：]?\s*([\d.]+)/i, /Waist.*Hip.*Ratio\s*[:：]?\s*([\d.]+)/i])
+    if (whr) data["腰臀比"] = whr
+
+    return data
+  }
+
+  const handleOcr = async () => {
+    if (!preview) return
+    setOcrLoading(true)
+    setOcrProgress(0)
+    setOcrError(null)
+
+    try {
+      const { recognize } = await import("tesseract.js")
+      const { data } = await recognize(preview, "chi_tra+eng", {
+        logger: (message) => {
+          if (message.status === "recognizing text" && typeof message.progress === "number") {
+            setOcrProgress(Math.round(message.progress * 100))
+          }
+        },
+      })
+
+      const text = data.text?.trim() || ""
+      setOcrText(text || null)
+      setOcrData(text ? parseOcrData(text) : null)
+    } catch (error) {
+      console.error("OCR failed:", error)
+      setOcrError("OCR 失敗，請確認照片清晰度後再試")
+    } finally {
+      setOcrLoading(false)
+    }
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
@@ -81,6 +153,8 @@ export function InBodyForm() {
       const { error: dbError } = await supabase.from("inbody_photos").insert({
         photo_url: urlData.publicUrl,
         measurement_date: date,
+        ocr_text: ocrText,
+        ocr_data: ocrData,
         notes: notes || null,
       })
 
@@ -89,6 +163,10 @@ export function InBodyForm() {
       // 重置表單
       setFile(null)
       setPreview(null)
+      setOcrText(null)
+      setOcrData(null)
+      setOcrProgress(0)
+      setOcrError(null)
       setNotes("")
       setDate(new Date().toISOString().split("T")[0])
       router.refresh()
@@ -124,6 +202,36 @@ export function InBodyForm() {
             <input id="photo" type="file" accept="image/*" onChange={handleFileChange} className="hidden" required />
           </label>
         </div>
+        {preview && (
+          <div className="mt-3 space-y-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleOcr}
+              disabled={ocrLoading}
+              className="w-full border-orange-200 text-orange-700 hover:bg-orange-50 bg-transparent"
+            >
+              {ocrLoading ? `辨識中... ${ocrProgress}%` : "自動辨識 (OCR)"}
+            </Button>
+            {ocrError && <p className="text-sm text-red-600">{ocrError}</p>}
+            {ocrData && Object.keys(ocrData).length > 0 && (
+              <div className="rounded-lg border border-orange-100 bg-orange-50/60 p-3">
+                <p className="text-sm font-medium text-slate-700 mb-2">辨識結果</p>
+                <div className="grid gap-1 text-sm text-slate-600">
+                  {Object.entries(ocrData).map(([key, value]) => (
+                    <div key={key} className="flex items-center justify-between">
+                      <span>{key}</span>
+                      <span className="font-medium text-slate-800">{value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {ocrText && !ocrData && (
+              <p className="text-sm text-slate-600">已完成辨識，但無法解析欄位，會保存原始文字。</p>
+            )}
+          </div>
+        )}
       </div>
 
       <div>

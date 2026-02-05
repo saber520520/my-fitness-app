@@ -3,6 +3,8 @@ CREATE TABLE IF NOT EXISTS inbody_photos (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   photo_url TEXT NOT NULL,
   measurement_date DATE NOT NULL,
+  ocr_text TEXT,
+  ocr_data JSONB,
   notes TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
