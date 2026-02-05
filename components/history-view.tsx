@@ -13,7 +13,6 @@ type HistoryViewProps = {
 
 export function HistoryView({ workouts, initialView }: HistoryViewProps) {
   const [view, setView] = useState(initialView)
-  const [dateLabels, setDateLabels] = useState<Record<string, string>>({})
 
   // 格式化日期顯示
   const formatDate = (dateString: string) => {
@@ -131,45 +130,6 @@ export function HistoryView({ workouts, initialView }: HistoryViewProps) {
     return { totalSets, exercises, workouts: workouts.length }
   }
 
-  const formatCreatedDate = (dateString: string) =>
-    new Intl.DateTimeFormat("zh-TW", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "long",
-    }).format(new Date(dateString))
-
-  const getCreatedDateLabel = (dateWorkouts: Workout[], fallback: string) => {
-    const createdDates = dateWorkouts
-      .map((workout) => workout.created_at)
-      .filter((value): value is string => Boolean(value))
-
-    if (createdDates.length === 0) {
-      return fallback
-    }
-
-    const earliestCreatedAt = createdDates.reduce((earliest, current) =>
-      new Date(current) < new Date(earliest) ? current : earliest,
-    )
-
-    return formatCreatedDate(earliestCreatedAt)
-  }
-
-  const handleDateLabelChange = (date: string, value: string, fallbackLabel: string) => {
-    const nextValue = value.trim()
-    setDateLabels((prev) => ({
-      ...prev,
-      [date]: nextValue || fallbackLabel,
-    }))
-  }
-
-  const handleDateLabelInput = (date: string, value: string) => {
-    setDateLabels((prev) => ({
-      ...prev,
-      [date]: value,
-    }))
-  }
-
   if (workouts.length === 0) {
     return <p className="text-slate-500 text-center py-8">尚未有任何訓練記錄</p>
   }
@@ -185,33 +145,16 @@ export function HistoryView({ workouts, initialView }: HistoryViewProps) {
 
       {/* 按日視圖 */}
       <TabsContent value="day" className="space-y-6">
-        {Object.entries(workoutsByDate).map(([date, dateWorkouts]) => {
-          const formattedDate = formatDate(date)
-          const createdDateLabel = getCreatedDateLabel(dateWorkouts, formattedDate)
-
-          return (
-            <div key={date} className="space-y-3">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="h-px flex-1 bg-slate-200" />
-              <input
-                className="text-sm font-semibold text-slate-700 px-3 rounded bg-transparent text-center outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                aria-label={`編輯日期標題 ${formattedDate}`}
-                value={dateLabels[date] ?? formattedDate}
-                onChange={(event) => handleDateLabelInput(date, event.target.value)}
-                onBlur={(event) => handleDateLabelChange(date, event.target.value, createdDateLabel)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault()
-                    event.currentTarget.blur()
-                  }
-                }}
-              />
-                <div className="h-px flex-1 bg-slate-200" />
-              </div>
-              <WorkoutList workouts={dateWorkouts as Workout[]} />
+        {Object.entries(workoutsByDate).map(([date, dateWorkouts]) => (
+          <div key={date} className="space-y-3">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-px flex-1 bg-slate-200" />
+              <h3 className="text-sm font-semibold text-slate-700 px-3">{formatDate(date)}</h3>
+              <div className="h-px flex-1 bg-slate-200" />
             </div>
-          )
-        })}
+            <WorkoutList workouts={dateWorkouts as Workout[]} />
+          </div>
+        ))}
       </TabsContent>
 
       {/* 按周視圖 */}
