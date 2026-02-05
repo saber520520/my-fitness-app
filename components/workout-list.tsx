@@ -37,7 +37,7 @@ export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; co
           {editingId === workout.id ? (
             <WorkoutForm editingWorkout={workout} onEditComplete={() => setEditingId(null)} />
           ) : (
-            <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors h-full">
+            <div className="p-6 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors h-full">
               <div className="flex gap-4">
                 {/* 影片在左邊 */}
                 {workout.video_url && (
