@@ -41,11 +41,11 @@ export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; co
               <div className="flex gap-4">
                 {/* 影片在左邊 */}
                 {workout.video_url && (
-                  <div className="flex-shrink-0 w-32 md:w-48 space-y-2">
+                  <div className="flex-shrink-0 w-24 sm:w-32 md:w-48 space-y-2">
                     <div className="relative group">
                       <video
                         src={workout.video_url}
-                        className="w-full h-32 md:h-48 object-cover rounded-lg bg-slate-900"
+                        className="w-full h-24 sm:h-32 md:h-48 object-cover rounded-lg bg-slate-900"
                         controls
                       />
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
