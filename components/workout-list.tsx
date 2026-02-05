@@ -6,7 +6,6 @@ import { Trash2, Edit, Video } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { WorkoutForm } from "./workout-form"
-import { FormAnalysis } from "./form-analysis"
 import type { Workout } from "@/lib/types"
 
 export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; columns?: 1 | 2 }) {
@@ -42,11 +41,11 @@ export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; co
               <div className="flex gap-4">
                 {/* 影片在左邊 */}
                 {workout.video_url && (
-                  <div className="flex-shrink-0 w-32 space-y-2">
+                  <div className="flex-shrink-0 w-48 space-y-2">
                     <div className="relative group">
                       <video
                         src={workout.video_url}
-                        className="w-full h-32 object-cover rounded-lg bg-slate-900"
+                        className="w-full h-48 object-cover rounded-lg bg-slate-900"
                         controls
                       />
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
@@ -55,7 +54,6 @@ export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; co
                         </div>
                       </div>
                     </div>
-                    <FormAnalysis videoUrl={workout.video_url} exerciseName={workout.exercise_name} />
                   </div>
                 )}
 
