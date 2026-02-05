@@ -163,6 +163,13 @@ export function HistoryView({ workouts, initialView }: HistoryViewProps) {
     }))
   }
 
+  const handleDateLabelInput = (date: string, value: string) => {
+    setDateLabels((prev) => ({
+      ...prev,
+      [date]: value,
+    }))
+  }
+
   if (workouts.length === 0) {
     return <p className="text-slate-500 text-center py-8">尚未有任何訓練記錄</p>
   }
@@ -186,25 +193,19 @@ export function HistoryView({ workouts, initialView }: HistoryViewProps) {
             <div key={date} className="space-y-3">
               <div className="flex items-center gap-2 mb-3">
                 <div className="h-px flex-1 bg-slate-200" />
-                <h3
-                  className="text-sm font-semibold text-slate-700 px-3 rounded outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                  contentEditable
-                  suppressContentEditableWarning
-                  role="textbox"
-                  tabIndex={0}
-                  aria-label={`編輯日期標題 ${formattedDate}`}
-                  onBlur={(event) =>
-                    handleDateLabelChange(date, event.currentTarget.textContent || "", createdDateLabel)
+              <input
+                className="text-sm font-semibold text-slate-700 px-3 rounded bg-transparent text-center outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                aria-label={`編輯日期標題 ${formattedDate}`}
+                value={dateLabels[date] ?? formattedDate}
+                onChange={(event) => handleDateLabelInput(date, event.target.value)}
+                onBlur={(event) => handleDateLabelChange(date, event.target.value, createdDateLabel)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault()
+                    event.currentTarget.blur()
                   }
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      event.preventDefault()
-                      event.currentTarget.blur()
-                    }
-                  }}
-                >
-                  {dateLabels[date] ?? formattedDate}
-                </h3>
+                }}
+              />
                 <div className="h-px flex-1 bg-slate-200" />
               </div>
               <WorkoutList workouts={dateWorkouts as Workout[]} />
