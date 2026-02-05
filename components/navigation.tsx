@@ -19,10 +19,14 @@ export function Navigation() {
     <nav className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="flex items-center gap-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+            aria-label="回到首頁"
+          >
             <Activity className="h-6 w-6 text-blue-600" />
             <span className="text-xl font-bold text-slate-900">健身紀錄</span>
-          </div>
+          </Link>
           <div className="flex items-center gap-1">
             {navItems.map((item) => {
               const Icon = item.icon
