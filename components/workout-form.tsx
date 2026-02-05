@@ -9,6 +9,7 @@ import { useEffect, useState } from "react"
 import type React from "react"
 import { Plus, Trash2, X, ChevronDown } from "lucide-react"
 import { useRouter } from "next/navigation"
+import type { Workout } from "@/lib/types"
 
 type SetData = {
   weight: string
@@ -16,21 +17,14 @@ type SetData = {
 }
 
 type WorkoutFormProps = {
-  editingWorkout?: {
-    id: string
-    workout_date: string
-    exercise_name: string
-    sets_data: { weight: number; reps: number }[]
-    video_url?: string
-    weight_unit?: "kg" | "lbs"
-  }
+  editingWorkout?: Workout
   onEditComplete?: () => void
 }
 
 export function WorkoutForm({ editingWorkout, onEditComplete }: WorkoutFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const [videoUrl, setVideoUrl] = useState(editingWorkout?.video_url || "")
+  const [videoUrl, setVideoUrl] = useState(editingWorkout?.video_url ?? "")
   const [isUploadingVideo, setIsUploadingVideo] = useState(false)
   const [exerciseHistory, setExerciseHistory] = useState<string[]>([])
   const [showExerciseDropdown, setShowExerciseDropdown] = useState(false)
