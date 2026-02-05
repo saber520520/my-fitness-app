@@ -3,6 +3,8 @@ import { TodayWorkouts } from "@/components/today-workouts";
 import { RecentWorkouts } from "@/components/recent-workouts";
 import { SupabaseConfigAlert } from "@/components/supabase-config-alert";
 
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50">
