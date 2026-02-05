@@ -85,14 +85,9 @@ export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; co
                   </div>
                   <div className="space-y-0 sm:space-y-1">
                     {workout.sets_data.map((set, index) => (
-                      <div key={index} className="text-sm text-slate-600 leading-tight flex">
-                        <span className="inline-block w-14 flex-shrink-0 text-right">
-                          第 {index + 1} 組：
-                        </span>
-                        <span className="pl-1">
-                          {set.weight} {workout.weight_unit || "kg"} × {set.reps} 次
-                        </span>
-                      </div>
+                      <p key={index} className="text-sm text-slate-600 leading-tight">
+                        第 {index + 1} 組：{set.weight} {workout.weight_unit || "kg"} × {set.reps} 次
+                      </p>
                     ))}
                   </div>
                 </div>
