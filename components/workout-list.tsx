@@ -62,7 +62,7 @@ export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; co
 
                 {/* 文字內容在右邊 */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between mb-2 sm:mb-3 gap-2">
+                  <div className="flex items-start justify-between mb-1 sm:mb-3 gap-2">
                     <h3 className="font-bold text-lg text-slate-900 truncate pr-2">{workout.exercise_name}</h3>
                     <div className="flex gap-1 flex-shrink-0 flex-col items-end sm:flex-row sm:items-center">
                       <Button
@@ -83,9 +83,9 @@ export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; co
                       </Button>
                     </div>
                   </div>
-                  <div className="space-y-0.5 sm:space-y-1">
+                  <div className="space-y-0 sm:space-y-1">
                     {workout.sets_data.map((set, index) => (
-                      <p key={index} className="text-sm text-slate-600 leading-snug">
+                      <p key={index} className="text-sm text-slate-600 leading-tight">
                         第 {index + 1} 組：{set.weight} {workout.weight_unit || "kg"} × {set.reps} 次
                       </p>
                     ))}
