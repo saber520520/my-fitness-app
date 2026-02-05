@@ -14,6 +14,24 @@ type HistoryViewProps = {
 export function HistoryView({ workouts, initialView }: HistoryViewProps) {
   const [view, setView] = useState(initialView)
 
+  const bodyPartRules = [
+    { label: "胸", keywords: ["胸", "臥推", "推胸", "飛鳥", "pec", "chest", "bench", "fly"] },
+    { label: "背", keywords: ["背", "划船", "下拉", "引體", "row", "pulldown", "pull-up", "lat"] },
+    { label: "腿", keywords: ["腿", "深蹲", "硬舉", "腿推", "腿屈伸", "蹬腿", "squat", "deadlift", "leg"] },
+    { label: "肩", keywords: ["肩", "推舉", "側平舉", "前平舉", "肩推", "shoulder", "press", "raise"] },
+    { label: "手臂", keywords: ["二頭", "三頭", "手臂", "彎舉", "伸展", "curl", "tricep", "bicep"] },
+    { label: "核心", keywords: ["核心", "腹", "仰臥起坐", "棒式", "plank", "crunch", "abs", "core"] },
+    { label: "有氧", keywords: ["有氧", "跑步", "單車", "跳繩", "划船機", "cardio", "run", "bike", "rower"] },
+  ]
+
+  const classifyBodyPart = (exerciseName: string) => {
+    const name = exerciseName.toLowerCase()
+    const matched = bodyPartRules.find((rule) =>
+      rule.keywords.some((keyword) => name.includes(keyword.toLowerCase())),
+    )
+    return matched?.label ?? "其他"
+  }
+
   // 格式化日期顯示
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -123,6 +141,18 @@ export function HistoryView({ workouts, initialView }: HistoryViewProps) {
     {} as Record<string, Workout[]>,
   )
 
+  const workoutsByBodyPart = workouts.reduce(
+    (acc, workout) => {
+      const part = classifyBodyPart(workout.exercise_name)
+      if (!acc[part]) {
+        acc[part] = []
+      }
+      acc[part].push(workout)
+      return acc
+    },
+    {} as Record<string, Workout[]>,
+  )
+
   // 計算統計數據
   const getStats = (workouts: Workout[]) => {
     const totalSets = workouts.reduce((sum, w) => sum + (w.sets_data?.length || 0), 0)
@@ -136,25 +166,38 @@ export function HistoryView({ workouts, initialView }: HistoryViewProps) {
 
   return (
     <Tabs value={view} onValueChange={setView} className="w-full">
-      <TabsList className="grid w-full grid-cols-4 mb-6">
+      <TabsList className="grid w-full grid-cols-5 mb-6">
         <TabsTrigger value="day">按日</TabsTrigger>
         <TabsTrigger value="week">按周</TabsTrigger>
         <TabsTrigger value="month">按月</TabsTrigger>
         <TabsTrigger value="exercise">按動作</TabsTrigger>
+        <TabsTrigger value="body">按部位</TabsTrigger>
       </TabsList>
 
       {/* 按日視圖 */}
       <TabsContent value="day" className="space-y-6">
-        {Object.entries(workoutsByDate).map(([date, dateWorkouts]) => (
-          <div key={date} className="space-y-3">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="h-px flex-1 bg-slate-200" />
-              <h3 className="text-sm font-semibold text-slate-700 px-3">{formatDate(date)}</h3>
-              <div className="h-px flex-1 bg-slate-200" />
+        {Object.entries(workoutsByDate).map(([date, dateWorkouts]) => {
+          const parts = Array.from(new Set(dateWorkouts.map((workout) => classifyBodyPart(workout.exercise_name))))
+          return (
+            <div key={date} className="space-y-3">
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <div className="h-px flex-1 bg-slate-200" />
+                <h3 className="text-sm font-semibold text-slate-700 px-3">{formatDate(date)}</h3>
+                {parts.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {parts.map((part) => (
+                      <Badge key={part} variant="secondary">
+                        {part}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                <div className="h-px flex-1 bg-slate-200" />
+              </div>
+              <WorkoutList workouts={dateWorkouts as Workout[]} />
             </div>
-            <WorkoutList workouts={dateWorkouts as Workout[]} />
-          </div>
-        ))}
+          )
+        })}
       </TabsContent>
 
       {/* 按周視圖 */}
@@ -265,6 +308,28 @@ export function HistoryView({ workouts, initialView }: HistoryViewProps) {
                   </div>
                 </div>
                 <WorkoutList workouts={exerciseWorkouts} />
+              </div>
+            )
+          })}
+      </TabsContent>
+
+      {/* 按部位視圖 */}
+      <TabsContent value="body" className="space-y-6">
+        {Object.entries(workoutsByBodyPart)
+          .sort(([, a], [, b]) => b.length - a.length)
+          .map(([part, partWorkouts]) => {
+            const stats = getStats(partWorkouts)
+            return (
+              <div key={part} className="border border-slate-200 rounded-lg p-4 bg-white">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold text-slate-900">{part}</h3>
+                  <div className="flex gap-2">
+                    <Badge variant="secondary">{stats.workouts} 次</Badge>
+                    <Badge variant="secondary">{stats.exercises} 個動作</Badge>
+                    <Badge variant="secondary">{stats.totalSets} 組</Badge>
+                  </div>
+                </div>
+                <WorkoutList workouts={partWorkouts} />
               </div>
             )
           })}
