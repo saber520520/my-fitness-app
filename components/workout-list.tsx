@@ -40,8 +40,8 @@ export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; co
             <div className="p-4 sm:p-6 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors h-full">
               <div className="flex gap-3 sm:gap-4">
                 {/* 影片在左邊 */}
-                {workout.video_url && (
-                  <div className="flex-shrink-0 w-24 sm:w-32 md:w-48 self-stretch">
+                <div className="flex-shrink-0 w-24 sm:w-32 md:w-48 self-stretch">
+                  {workout.video_url ? (
                     <div className="relative group h-full">
                       <video
                         src={workout.video_url}
@@ -57,8 +57,21 @@ export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; co
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <div className="h-full min-h-24 sm:min-h-32 md:min-h-48 rounded-lg border border-dashed border-slate-300 bg-slate-50/70 flex flex-col items-center justify-center gap-2 text-slate-500">
+                      <Video className="h-5 w-5 text-slate-400" />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-7 px-2 text-xs"
+                        onClick={() => setEditingId(workout.id)}
+                      >
+                        新增影片
+                      </Button>
+                    </div>
+                  )}
+                </div>
 
                 {/* 文字內容在右邊 */}
                 <div className="flex-1 min-w-0">
