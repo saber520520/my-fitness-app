@@ -4,13 +4,22 @@ import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/client"
 import { Trash2, Edit, Video } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { WorkoutForm } from "./workout-form"
 import type { Workout } from "@/lib/types"
 
 export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; columns?: 1 | 2 }) {
   const router = useRouter()
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [isSmallScreen, setIsSmallScreen] = useState(false)
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 640px)")
+    const update = () => setIsSmallScreen(media.matches)
+    update()
+    media.addEventListener("change", update)
+    return () => media.removeEventListener("change", update)
+  }, [])
 
   const handleDelete = async (id: string) => {
     const supabase = createClient()
@@ -41,11 +50,16 @@ export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; co
               <div className="flex gap-4">
                 {/* 影片在左邊 */}
                 {workout.video_url && (
-                  <div className="flex-shrink-0 w-24 sm:w-32 md:w-48 space-y-2">
+                  <div className="flex-shrink-0 w-24 sm:w-32 md:w-48 space-y-0 sm:space-y-2">
                     <div className="relative group">
                       <video
                         src={workout.video_url}
                         className="w-full h-24 sm:h-32 md:h-48 object-cover rounded-lg bg-slate-900"
+                        preload="metadata"
+                        playsInline
+                        muted={isSmallScreen}
+                        autoPlay={isSmallScreen}
+                        loop={isSmallScreen}
                         controls
                       />
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
@@ -59,7 +73,7 @@ export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; co
 
                 {/* 文字內容在右邊 */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between mb-3 gap-2">
+                  <div className="flex items-start justify-between mb-1 sm:mb-3 gap-2">
                     <h3 className="font-bold text-lg text-slate-900 truncate pr-2">{workout.exercise_name}</h3>
                     <div className="flex gap-1 flex-shrink-0 flex-col items-end sm:flex-row sm:items-center">
                       <Button
@@ -80,7 +94,7 @@ export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; co
                       </Button>
                     </div>
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-0 sm:space-y-1">
                     {workout.sets_data.map((set, index) => (
                       <p key={index} className="text-sm text-slate-600">
                         第 {index + 1} 組：{set.weight} {workout.weight_unit || "kg"} × {set.reps} 次
