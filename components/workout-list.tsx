@@ -37,7 +37,7 @@ export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; co
           {editingId === workout.id ? (
             <WorkoutForm editingWorkout={workout} onEditComplete={() => setEditingId(null)} />
           ) : (
-            <div className="p-6 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors h-full">
+            <div className="p-4 sm:p-6 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors h-full">
               <div className="flex gap-4">
                 {/* 影片在左邊 */}
                 {workout.video_url && (
@@ -59,9 +59,9 @@ export function WorkoutList({ workouts, columns = 2 }: { workouts: Workout[]; co
 
                 {/* 文字內容在右邊 */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="font-bold text-lg text-slate-900 truncate">{workout.exercise_name}</h3>
-                    <div className="flex gap-1 flex-shrink-0">
+                  <div className="flex items-start justify-between mb-3 gap-2">
+                    <h3 className="font-bold text-lg text-slate-900 truncate pr-2">{workout.exercise_name}</h3>
+                    <div className="flex gap-1 flex-shrink-0 flex-col items-end sm:flex-row sm:items-center">
                       <Button
                         variant="ghost"
                         size="icon"
